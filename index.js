@@ -3,7 +3,7 @@ const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const cors = require("cors");
 const PORT = process.env.PORT || 5000;
-const { addUser, getUser, deleteUser, getUsers } = require("./users");
+const { addUser, deleteUser, getUsers } = require("./users");
 
 app.use(cors());
 
@@ -13,8 +13,13 @@ const generateRoomId = () =>
 
 io.on("connect", (socket) => {
   socket.on("join", ({ name, room, avatar }, callback) => {
-    const { user, error } = addUser(socket.id, name, room, avatar);
-    if (error) return callback(error);
+    const { user, error } = addUser(socket.id, name, room, avatar, true);
+
+    if (error) {
+      console.log(error);
+      return callback(error);
+    }
+
     socket.join(user.room);
 
     io.in(room).emit("users", getUsers(room));
@@ -28,9 +33,13 @@ io.on("connect", (socket) => {
       room = generateRoomId();
     } while (io.sockets.adapter.rooms[room]);
 
-    const { error, user } = addUser(socket.id, name, room, avatar);
+    const { error, user } = addUser(socket.id, name, room, avatar, false);
 
-    if (error) return callback(error);
+    if (error) {
+      console.log(error);
+      return callback(error);
+    }
+
     socket.join(user.room);
 
     io.in(room).emit("users", getUsers(room));

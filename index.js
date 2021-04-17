@@ -13,11 +13,11 @@ const generateRoomId = () =>
 
 io.on("connect", (socket) => {
   socket.on("join", ({ name, room, avatar }, callback) => {
-    const { user, error } = addUser(socket.id, name, room, avatar, true);
+    const { user, errors } = addUser(socket.id, name, room, avatar, true);
 
-    if (error) {
-      console.log(error);
-      return callback(error);
+    if (errors) {
+      console.log(errors);
+      return callback(errors);
     }
 
     socket.join(user.room);
@@ -33,11 +33,11 @@ io.on("connect", (socket) => {
       room = generateRoomId();
     } while (io.sockets.adapter.rooms[room]);
 
-    const { error, user } = addUser(socket.id, name, room, avatar, false);
+    const { errors, user } = addUser(socket.id, name, room, avatar, false);
 
-    if (error) {
-      console.log(error);
-      return callback(error);
+    if (errors) {
+      console.log(errors);
+      return callback(errors);
     }
 
     socket.join(user.room);

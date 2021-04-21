@@ -1,63 +1,45 @@
-const users = [];
+let users = [];
 
-const addUser = (id, name, room, avatar, joinRoom) => {
+const createUser = (id, name, avatar) => {
   let errors = [];
 
-  if (joinRoom) {
-    const existingUser = getUserInRoom(name, room);
-
-    const validRoom = isRoomValid(room);
-
-    if (existingUser) {
-      console.log("username already taken");
-      errors.push({ message: "usernameTaken", type: "username" });
-    }
-
-    if (!validRoom) {
-      console.log("this room does not exist");
-
-      errors.push({ message: "roomInvalid", type: "room" });
-    }
-  }
-
-  if (!name && !room) {
-    errors.push({ message: "avatarRequired", type: "avatar" });
-  }
+  // return errors if no name or no avatar
   if (!name) {
     errors.push({ message: "usernameRequired", type: "username" });
   }
-  if (!room) {
-    errors.push({ message: "roomRequired", type: "room" });
-  }
-
   if (!avatar) {
     errors.push({ message: "avatarRequired", type: "avatar" });
   }
 
   if (errors.length > 0) return { errors };
 
-  const user = { id, name, room, avatar };
+  // user object
+  const user = {
+    id: id,
+    name: name,
+    avatar: avatar,
+    points: 0,
+    sips: 0,
+    room: "",
+  };
+
   users.push(user);
+
   return { user };
 };
 
 const deleteUser = (id) => {
-  const index = users.findIndex((user) => user.id === id);
-  if (index !== -1) return users.splice(index, 1)[0];
+  users = users.filter((user) => {
+    user.id !== id;
+  });
 };
 
-const getUser = (id) => users.find((user) => user.id === id);
-
-const getUsers = (room) => users.filter((user) => user.room === room);
-
-const isRoomValid = (room) => users.find((user) => user.room === room);
-
-const getUserInRoom = (name, room) =>
-  users.find((user) => user.name === name && user.room === room);
+const getUser = (id) => {
+  return users.find((user) => user.id === id);
+};
 
 module.exports = {
-  addUser,
+  createUser,
   deleteUser,
   getUser,
-  getUsers,
 };

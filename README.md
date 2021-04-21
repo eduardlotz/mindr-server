@@ -1,2 +1,2 @@
 # mindr-server
- node.js server with socket.io for mindr - 
+ node.js express server with socket.io for mindr - 

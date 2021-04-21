@@ -30,8 +30,7 @@ const createRoomAndJoin = (id, user) => {
   rooms.push(room);
 
   user.room = room.id;
-
-  console.log(`new room created ${room.id}`);
+  user.isCreator = true;
 
   return { room };
 };
@@ -42,14 +41,7 @@ const joinRoom = (id, user) => {
   //check if user already in another room
   const foundUser = findUser(user.id);
 
-  console.log(`checking if ${id} exists`);
   const room = findRoom(id);
-
-  if (room) console.log("room", room);
-  else console.log("this room is a lie");
-
-  console.log("look at all rooms");
-  console.log(rooms);
 
   if (foundUser) {
     errors.push({
@@ -82,20 +74,6 @@ const joinRoom = (id, user) => {
 
   return { room };
 };
-
-// const leaveRoom = (userId, roomId) => {
-//   let errors = [];
-
-//   const room = findRoom(roomId);
-
-//   if (!room) errors.push({ message: "failedLeaving", type: "console" });
-
-//   if (errors.length > 0) return { errors };
-
-//   return room.members.filter((user) => {
-//     user.id !== userId;
-//   });
-// };
 
 const leaveRoom = (userId) => {
   let errors = [];

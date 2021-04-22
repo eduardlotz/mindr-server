@@ -30,7 +30,7 @@ const createRoomAndJoin = (id, user) => {
   rooms.push(room);
 
   user.room = room.id;
-
+  user.isCreator = true;
 
   return { room };
 };

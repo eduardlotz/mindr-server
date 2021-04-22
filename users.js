@@ -21,6 +21,7 @@ const createUser = (id, name, avatar) => {
     points: 0,
     sips: 0,
     room: "",
+    isCreator: false,
   };
 
   users.push(user);

@@ -51,6 +51,32 @@ io.on("connect", (socket) => {
     callback();
   });
 
+  socket.on("pick_game", ({ id }, callback) => {
+    const errors = [];
+
+    const user = getUser(socket.id);
+
+    const room = findRoom(user.room);
+
+    room.games.push(id);
+
+    io.in(room.id).emit("pick_game", id);
+
+    callback();
+  });
+
+  socket.on("remove_game", ({ id }, callback) => {
+    const user = getUser(socket.id);
+
+    const room = findRoom(user.room);
+
+    room.games = room.games.filter((game) => game !== id);
+
+    io.in(room.id).emit("remove_game", id);
+
+    callback();
+  });
+
   socket.on("create_room", ({ name, avatar }, callback) => {
     let room;
 

@@ -70,6 +70,10 @@ io.on("connect", (socket) => {
 
     const room = findRoom(user.room);
 
+    if (!room) {
+      return callback({ message: "error unpicking game", type: "toast" });
+    }
+
     room.games = room.games.filter((game) => game !== id);
 
     io.in(room.id).emit("remove_game", id);

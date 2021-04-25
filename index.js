@@ -10,6 +10,8 @@ const {
   joinRoom,
   leaveRoom,
   findRoom,
+  roomLimitReached,
+  getRoomsCount,
 } = require("./rooms");
 
 app.use(cors());
@@ -17,6 +19,8 @@ app.use(cors());
 // generates a random 4 characters string
 const generateRoomId = () =>
   Math.random().toString(36).substr(2, 4).toUpperCase();
+
+const ROOMS_LIMIT = 5;
 
 io.on("connect", (socket) => {
   socket.on("join", ({ name, room, avatar }, callback) => {
@@ -51,6 +55,19 @@ io.on("connect", (socket) => {
     callback();
   });
 
+  socket.on("leave_room", () => {
+    console.log(`${socket.id} left the room`);
+
+    const { errors, roomId } = leaveRoom(socket.id);
+
+    if (errors) {
+      console.log(errors);
+    } else {
+      io.in(roomId).emit("users", getUsersInRoom(roomId));
+    }
+    socket.emit("left_room");
+  });
+
   socket.on("pick_game", ({ id }, callback) => {
     const errors = [];
 
@@ -58,6 +75,11 @@ io.on("connect", (socket) => {
 
     const room = findRoom(user.room);
 
+    if (!room) {
+      errors.push({ message: "unexpected error oopsi", type: "toast" });
+      console.log(errors);
+      return callback(errors);
+    }
     room.games.push(id);
 
     io.in(room.id).emit("pick_game", id);
@@ -82,6 +104,17 @@ io.on("connect", (socket) => {
   });
 
   socket.on("create_room", ({ name, avatar }, callback) => {
+    if (roomLimitReached(ROOMS_LIMIT)) {
+      let errors = [];
+
+      errors.push({
+        message: `rooms limit of ${ROOMS_LIMIT}reached. remove a room to create a new one.`,
+        type: "toast",
+      });
+      console.log(errors);
+      return callback(errors);
+    }
+
     let room;
 
     do {
@@ -106,6 +139,8 @@ io.on("connect", (socket) => {
     }
 
     socket.join(room);
+
+    console.log("new rooms count: " + getRoomsCount());
 
     // emit new room id to client
     io.to(socket.id).emit("joined_room", room);

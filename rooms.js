@@ -90,6 +90,16 @@ const leaveRoom = (userId) => {
 
       const roomId = room.id;
 
+      //remove the room if it has no members
+      if (room.members.length === 0) {
+        removeFromArray(rooms, room);
+        errors.push({
+          message: "Room was deleted, because tha last memeber left.",
+          type: "info",
+        });
+        return { errors };
+      }
+
       return { roomId };
     }
   }
@@ -111,10 +121,27 @@ const findUser = (id) => {
 
 const findRoom = (id) => rooms.find((room) => room.id === id);
 
+const roomLimitReached = (limit) => {
+  return rooms.length === limit;
+};
+
+const getRoomsCount = () => {
+  return rooms.length;
+};
+
+function removeFromArray(arr, value) {
+  var index = arr.indexOf(value);
+  if (index > -1) {
+    arr.splice(index, 1);
+  }
+}
+
 module.exports = {
   createRoomAndJoin,
   getUsersInRoom,
   joinRoom,
   leaveRoom,
   findRoom,
+  roomLimitReached,
+  getRoomsCount,
 };

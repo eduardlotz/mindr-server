@@ -94,7 +94,7 @@ const leaveRoom = (userId) => {
       if (room.members.length === 0) {
         removeFromArray(rooms, room);
         errors.push({
-          message: "Room was deleted, because tha last memeber left.",
+          message: "Room was deleted, because the last member left.",
           type: "info",
         });
         return { errors };

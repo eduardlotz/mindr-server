@@ -2,7 +2,16 @@ const app = require("express")();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const cors = require("cors");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const PORT = process.env.PORT || 5000;
+const uri = process.env.MONGODB_URI;
+
+const Message = require("./Message");
+const mongoose = require("mongoose");
+const ROOMS_LIMIT = 5;
+
 const { createUser, deleteUser, getUser } = require("./users");
 const {
   createRoomAndJoin,
@@ -16,13 +25,32 @@ const {
 
 app.use(cors());
 
+mongoose
+  .connect(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    console.log("connected to mongodb");
+  })
+  .catch((err) => console.log(err));
+
 // generates a random 4 characters string
 const generateRoomId = () =>
   Math.random().toString(36).substr(2, 4).toUpperCase();
 
-const ROOMS_LIMIT = 5;
-
 io.on("connect", (socket) => {
+  // Get the last 10 messages from the database.
+  Message.find()
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .exec((err, messages) => {
+      if (err) return console.error(err);
+
+      // Send the last messages to the user.
+      socket.emit("init_messages", messages);
+    });
+
   socket.on("join", ({ name, room, avatar }, callback) => {
     console.log(`${name} is trying to join ${room}`);
 
@@ -53,6 +81,25 @@ io.on("connect", (socket) => {
     io.to(user.id).emit("game_settings", settings);
 
     callback();
+  });
+
+  // Listen to connected users for a new message.
+  socket.on("message", (message) => {
+    // Create a message with the content and the name of the user.
+    const user = getUser(socket.id);
+
+    const msg = new Message({
+      content: message,
+      user: user.name,
+    });
+
+    // Save the message to the database.
+    msg.save((err) => {
+      if (err) return console.error(err);
+    });
+
+    // Notify all other users about a new message.
+    io.in(user.room).emit("new_message", msg);
   });
 
   socket.on("leave_room", () => {

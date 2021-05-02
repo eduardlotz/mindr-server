@@ -1,9 +1,11 @@
-const { Rooms, Chats } = require('../database/models');
-const { findRoomUsers } = require('../utils');
+const { Rooms, Chats } = require("../database/models");
+const { findRoomUsers } = require("../utils");
 
 const joinRoom = (io, socket) => async ({ room }) => {
   try {
     const { _id } = socket.decoded;
+
+    console.log(_id + " is joining room " + room);
 
     socket.join(room);
 
@@ -12,9 +14,11 @@ const joinRoom = (io, socket) => async ({ room }) => {
     const roomMessages = await Chats.find({ room });
     const usersInfo = await findRoomUsers(room);
 
-    socket.emit('msg', roomMessages);
+    console.log("users in room", usersInfo);
 
-    io.to(room).emit('joinRoom', usersInfo);
+    socket.emit("msg", roomMessages);
+
+    io.to(room).emit("joinRoom", usersInfo);
   } catch (err) {
     console.log(err);
   }

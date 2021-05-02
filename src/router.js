@@ -1,27 +1,24 @@
-const express = require('express');
+const express = require("express");
 
 const {
   clientError,
   serverError,
-  signup,
+  authenticate,
   login,
-  googleLogin,
   checkToken,
   logout,
-  getRooms,
   addRoom,
-} = require('./controllers');
+} = require("./controllers");
 
-const { withAuth } = require('./middleware');
+const { withAuth } = require("./middleware");
 
 const router = express.Router();
 
-router.get('/checkToken', checkToken);
-router.get('/logout', logout);
-router.get('/rooms', withAuth, getRooms);
-router.post('/rooms', withAuth, addRoom);
-router.post('/signup', signup);
-router.post('/login', login);
+router.get("/checkToken", checkToken);
+router.get("/logout", logout);
+router.get("/room", withAuth, addRoom);
+router.post("/auth", authenticate);
+router.post("/login", login);
 router.use(clientError);
 router.use(serverError);
 

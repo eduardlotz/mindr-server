@@ -1,17 +1,15 @@
-const { validateRoomName, isNewRoom, createRoom } = require('../../utils');
+const { isNewRoom, createRoom } = require("../../utils");
 
 const addRoom = async (req, res, next) => {
   try {
-    const { room } = req.body;
-    const { role } = req.userData;
+    let room = "";
+    do {
+      room = Math.random().toString(36).substr(2, 4).toUpperCase();
+    } while (!isNewRoom(room));
 
-    await validateRoomName(room);
-    await isNewRoom(room);
-    await createRoom(room, role);
+    await createRoom(room);
 
-    res
-      .status(201)
-      .json({ statusCode: 201, message: 'room has been created successfully' });
+    res.json({ statusCode: 200, data: room });
   } catch (err) {
     next(err);
   }

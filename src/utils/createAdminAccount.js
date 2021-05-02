@@ -1,14 +1,10 @@
 // only used for testing
-const bcrypt = require('bcrypt');
-
 const { Users } = require('../database/models');
 
-const createAdmin = async ({ username, email, password }) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
+const createAdmin = async ({ username, avatar }) => {
   await Users.create({
     username,
-    email,
-    password: hashedPassword,
+    avatar,
     role: 'admin',
   });
 };

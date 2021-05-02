@@ -1,10 +1,12 @@
-const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require("uuid");
 
-const { Users } = require('../database/models');
+const { Users } = require("../database/models");
 
-const createUser = async ({ username, email, password }) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await Users.create({ username, email, password: hashedPassword });
+const createUser = async ({ username, avatar }) => {
+  const uuid = uuidv4();
+  console.log("uuid", uuid);
+  await Users.create({ username, avatar, uuid });
+  return uuid;
 };
 
 module.exports = createUser;

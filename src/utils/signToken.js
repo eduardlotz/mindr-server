@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const signToken = (payload) =>
   new Promise((resolve, reject) => {

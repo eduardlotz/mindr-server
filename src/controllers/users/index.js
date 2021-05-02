@@ -1,10 +1,10 @@
-const signup = require('./signup');
-const login = require('./login');
-const checkToken = require('./checkToken');
-const logout = require('./logout');
+const authenticate = require("./authenticate");
+const login = require("./login");
+const checkToken = require("./checkToken");
+const logout = require("./logout");
 
 module.exports = {
-  signup,
+  authenticate,
   login,
   checkToken,
   logout,

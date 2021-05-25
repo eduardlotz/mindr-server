@@ -7,10 +7,15 @@ const addRoom = async (req, res, next) => {
       room = Math.random().toString(36).substr(2, 4).toUpperCase();
     } while (!isNewRoom(room));
 
-    await createRoom(room);
+    const user = await getUserByUid(req.body.uuid);
+
+    await createRoom(room, user);
+
+    console.log("room created", room);
 
     res.json({ statusCode: 200, data: room });
   } catch (err) {
+    console.error("failed to create a new room");
     next(err);
   }
 };

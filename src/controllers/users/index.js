@@ -1,11 +1,11 @@
 const authenticate = require("./authenticate");
-const login = require("./login");
+const addUser = require("./addUser");
 const checkToken = require("./checkToken");
 const logout = require("./logout");
 
 module.exports = {
   authenticate,
-  login,
+  addUser,
   checkToken,
   logout,
 };

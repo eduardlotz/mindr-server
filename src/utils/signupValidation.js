@@ -3,7 +3,7 @@ const yup = require("yup");
 const createError = require("./createError");
 
 const signupValidationSchema = yup.object().shape({
-  username: yup.string().required().min(3).max(24),
+  name: yup.string().required().min(3).max(24),
   avatar: yup.string().required(),
 });
 

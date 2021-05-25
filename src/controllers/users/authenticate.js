@@ -16,17 +16,16 @@ const authenticate = async (req, res, next) => {
 
     console.log(user);
 
-    const token = await createToken(user._id, user.role);
+    const token = await createToken(uuid);
 
-    res
-      .cookie("mindrToken", token)
-      .status(201)
-      .json({
-        statusCode: 201,
-        message: "user authenticated and token created",
-      });
+    res.cookie("token", token).status(200).json({
+      statusCode: 200,
+      message: "user authenticated and token created",
+      token,
+    });
   } catch (err) {
-    console.error("couldn't create token cookie");
+    console.log("couldn't create token cookie");
+    console.log(err);
     next(err);
   }
 };

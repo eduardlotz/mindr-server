@@ -1,5 +1,4 @@
 const { server } = require("./app");
-var assert = require("assert");
 
 const port = process.env.PORT || 4000;
 

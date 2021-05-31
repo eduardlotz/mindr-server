@@ -1,4 +1,4 @@
-const { Rooms, Chats } = require("../database/models");
+const { Rooms } = require("../database/models");
 const { findRoomUsers } = require("../utils");
 
 const joinRoom =

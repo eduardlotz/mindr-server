@@ -1,6 +1,6 @@
 const { clientError, serverError } = require("./errorHandlers");
 const { authenticate, addUser, checkToken, logout } = require("./users");
-const { getRooms, addRoom } = require("./rooms");
+const { getRooms, addRoom, joinRoom } = require("./rooms");
 
 module.exports = {
   clientError,
@@ -11,4 +11,5 @@ module.exports = {
   logout,
   getRooms,
   addRoom,
+  joinRoom,
 };

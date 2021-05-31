@@ -1,27 +1,42 @@
 const { Rooms, Chats } = require("../database/models");
 const { findRoomUsers } = require("../utils");
 
-const joinRoom = (io, socket) => async (room) => {
-  try {
-    const _id = socket.id;
+const joinRoom =
+  (io, socket) =>
+  async ({ name, avatar, roomName }) => {
+    try {
+      const id = socket.id;
 
-    console.log(_id + " is joining room " + room);
+      console.log(id + " is joining room " + roomName);
 
-    socket.join(room);
+      const user = { name, avatar };
 
-    await Rooms.updateOne({ room }, { $addToSet: { users: [_id] } });
+      console.log("user who joins:", user);
+      console.log("room to join", roomName);
 
-    // const roomMessages = await Chats.find({ room });
-    const usersInfo = await findRoomUsers(room);
+      const room = await Rooms.findOne({ name: roomName });
 
-    console.log("users in room", usersInfo);
+      if (!room)
+        throw createError(400, "Bad Request", "this room does not exist");
 
-    // socket.emit("msg", roomMessages);
+      room.users.push({
+        name: user.name,
+        avatar: user.avatar,
+        isCreator: false,
+        uuid: id,
+      });
 
-    io.to(room).emit("joinRoom", usersInfo);
-  } catch (err) {
-    console.log(err);
-  }
-};
+      const roomJoined = await room.save();
+      console.log("roomJoined", roomJoined);
+
+      socket.join(roomName);
+
+      // const roomMessages = await Chats.find({ room });
+
+      io.to(room.name).emit("joinRoom", roomJoined);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 module.exports = joinRoom;

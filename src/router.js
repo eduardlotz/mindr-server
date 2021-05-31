@@ -7,7 +7,7 @@ const {
   checkToken,
   logout,
   addRoom,
-  addUser,
+  joinRoom,
 } = require("./controllers");
 
 const { withAuth } = require("./middleware");
@@ -16,8 +16,10 @@ const router = express.Router();
 
 router.get("/checkToken", checkToken);
 router.get("/logout", logout);
-router.get("/room", addRoom);
-router.post("/user", addUser);
+
+router.post("/room", addRoom);
+router.post("/join", joinRoom);
+
 router.post("/auth", authenticate);
 router.use(clientError);
 router.use(serverError);

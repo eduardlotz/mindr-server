@@ -1,19 +1,38 @@
-const { isNewRoom, createRoom } = require("../../utils");
+const { isNewRoom } = require("../../utils");
+const Rooms = require("../../database/models/Rooms");
+const { v4: uuidv4 } = require("uuid");
 
 const addRoom = async (req, res, next) => {
   try {
-    let room = "";
+    let roomName = "";
     do {
-      room = Math.random().toString(36).substr(2, 4).toUpperCase();
-    } while (!isNewRoom(room));
+      roomName = Math.random().toString(36).substr(2, 4).toUpperCase();
+    } while (!isNewRoom(roomName));
 
-    const user = await getUserByUid(req.body.uuid);
+    const user = { name: req.body.name, avatar: req.body.avatar };
 
-    await createRoom(room, user);
+    console.log("user who created room:", user);
+    console.log("room name", roomName);
 
-    console.log("room created", room);
+    // await validateSignUpData({ name, avatar });
 
-    res.json({ statusCode: 200, data: room });
+    const room = new Rooms({ name: roomName });
+
+    const uuid = uuidv4();
+
+    room.users = [
+      {
+        name: user.name,
+        avatar: user.avatar,
+        isCreator: true,
+        uuid: uuid,
+      },
+    ];
+
+    const roomCreated = await room.save();
+    console.log("roomCreated", roomCreated);
+
+    res.json({ statusCode: 200, data: roomName });
   } catch (err) {
     console.error("failed to create a new room");
     next(err);

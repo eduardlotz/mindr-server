@@ -1,18 +1,13 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model } = require("mongoose");
+const usersSchema = require("./Users");
 
 const roomSchema = new Schema({
-  room: {
+  name: {
     type: String,
-    required: true,
   },
-  users: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Users',
-    },
-  ],
+  users: [usersSchema],
 });
 
-const Rooms = model('Rooms', roomSchema);
+const Rooms = model("Rooms", roomSchema);
 
 module.exports = Rooms;

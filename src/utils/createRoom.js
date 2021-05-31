@@ -1,8 +1,6 @@
 const { Rooms } = require("../database/models");
 const createError = require("./createError");
 
-const createRoom = async (room, user) => {
-  return Rooms.create({ room, user });
-};
+const createRoom = async (roomName, user) => {};
 
 module.exports = createRoom;

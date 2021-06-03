@@ -17,7 +17,7 @@ const joinRoom = async (req, res, next) => {
     const uuid = uuidv4();
 
     if (!room)
-      throw createError(400, "Bad Request", "this room does not exist");
+      throw createError(400, "Bad Request", "roomInvalid");
 
     room.users.push({
       name: user.name,
@@ -26,8 +26,10 @@ const joinRoom = async (req, res, next) => {
       uuid: uuid,
     });
 
-    const roomCreated = await room.save();
-    console.log("roomCreated", roomCreated);
+    const roomAfterJoining = await room.save();
+    console.log("roomAfterJoining", roomAfterJoining);
+
+    io.to(room.name).emit("roomData", roomAfterJoining);
 
     res.json({ statusCode: 200, data: roomName });
   } catch (err) {

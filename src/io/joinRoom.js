@@ -14,11 +14,7 @@ const joinRoom =
       const room = await Rooms.findOne({ name: roomName });
 
       if (!room) {
-        const error = createError(
-          400,
-          "Bad Request",
-          "This room doesn't exist."
-        );
+        const error = createError(400, "Bad Request", "roomInvalid");
 
         callback(error);
         throw error;
@@ -31,15 +27,15 @@ const joinRoom =
         uuid: id.toString(),
       });
 
-      const roomJoined = await room.save();
-      console.log("roomJoined", roomJoined);
+      const roomAfterJoining = await room.save();
+      console.log("roomAfterJoining", roomAfterJoining);
 
-      socket.join(roomName);
+      socket.join(room.name);
 
-      io.to(room.name).emit("joinRoom", roomJoined);
+      io.to(room.name).emit("roomData", roomAfterJoining);
+      callback(roomAfterJoining);
     } catch (err) {
       console.error(err);
-      // callback(err);
     }
   };
 

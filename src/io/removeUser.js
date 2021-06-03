@@ -1,50 +1,53 @@
 const { Rooms } = require("../database/models");
 const createError = require("../utils/createError");
 
-const leaveRoom =
+const removeUser =
   (io, socket) =>
-  async ({ roomName }, callback) => {
+  async ({ id, room: roomName }, callback) => {
     try {
-      const id = socket.id;
-      console.log("leaving id", id);
-      console.log("leaving room", roomName);
+      const clientId = socket.id;
+      console.log("client id", clientId);
 
       const room = await Rooms.findOne({ name: roomName });
 
       // message has to match an i18n translation string
       if (!room) {
         const error = createError(400, "Bad Request", "roomInvalid");
-
         callback(error);
         throw error;
       }
 
+      console.log("room where user gets kicked", room);
+
+      const sender = room.users.find((user) => user.uuid === clientId);
       const disconnectingUser = room.users.find((user) => user.uuid === id);
 
-      //set the next player as the creator, if leaving user was the creator
+      if (!sender) throw createError(400, "Bad Request", "invalidSender");
+      if (!sender.isCreator)
+        throw createError(401, "Authentication Failed", "authFailed");
+      if (disconnectingUser.uuid === sender.uuid)
+        throw createError(400, "Bad Request", "kickCreator");
+
       room.users = room.users.filter((user) => {
         return user.uuid !== disconnectingUser.uuid;
       });
-      if (disconnectingUser.isCreator && room.users.length > 0) {
-        room.users[0].isCreator = true;
-      }
 
-      const roomAfterLeaving = await room.save();
+      const roomAfterKicking = await room.save();
       socket.leave(room.name);
+
+      console.log("roomAfterKicking", roomAfterKicking);
 
       //if no users left in the room, delete the room
       //else inform others in room about the left user
-      if (roomAfterLeaving.users.length === 0)
+      if (roomAfterKicking.users.length === 0)
         Rooms.deleteOne({ name: roomName }, function (err) {
           if (err) console.log(err);
         });
-      else io.to(room.name).emit("roomData", roomAfterLeaving);
-
-      callback({ statusCode: 200 });
+      else io.to(room.name).emit("roomData", roomAfterKicking);
     } catch (err) {
       callback({ statusCode: 400 });
       console.error(err);
     }
   };
 
-module.exports = leaveRoom;
+module.exports = removeUser;

@@ -8,7 +8,7 @@ const checkIfRoomExists = async (req, res, next) => {
     const roomInvalid = await isNewRoom(roomName);
 
     if (!roomInvalid) {
-      const error = createError(400, "Bad Request", "This room doesn't exist.");
+      const error = createError(400, "Bad Request", "roomInvalid.");
       throw error;
     }
 

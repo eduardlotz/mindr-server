@@ -1,9 +1,9 @@
 const { Rooms } = require("../database/models");
-const { findRoomUsers } = require("../utils");
+const createError = require("../utils/createError");
 
 const joinRoom =
   (io, socket) =>
-  async ({ name, avatar, roomName }) => {
+  async ({ name, avatar, roomName }, callback) => {
     try {
       const id = socket.id;
 
@@ -11,19 +11,24 @@ const joinRoom =
 
       const user = { name, avatar };
 
-      console.log("user who joins:", user);
-      console.log("room to join", roomName);
-
       const room = await Rooms.findOne({ name: roomName });
 
-      if (!room)
-        throw createError(400, "Bad Request", "this room does not exist");
+      if (!room) {
+        const error = createError(
+          400,
+          "Bad Request",
+          "This room doesn't exist."
+        );
+
+        callback(error);
+        throw error;
+      }
 
       room.users.push({
         name: user.name,
         avatar: user.avatar,
         isCreator: false,
-        uuid: id,
+        uuid: id.toString(),
       });
 
       const roomJoined = await room.save();
@@ -31,11 +36,10 @@ const joinRoom =
 
       socket.join(roomName);
 
-      // const roomMessages = await Chats.find({ room });
-
       io.to(room.name).emit("joinRoom", roomJoined);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      // callback(err);
     }
   };
 

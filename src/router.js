@@ -8,6 +8,7 @@ const {
   logout,
   addRoom,
   joinRoom,
+  checkIfRoomExists,
 } = require("./controllers");
 
 const { withAuth } = require("./middleware");
@@ -17,6 +18,7 @@ const router = express.Router();
 router.get("/checkToken", checkToken);
 router.get("/logout", logout);
 
+router.post("/validateRoom", checkIfRoomExists);
 router.post("/room", addRoom);
 router.post("/join", joinRoom);
 

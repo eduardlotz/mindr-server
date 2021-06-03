@@ -2,9 +2,9 @@ const { Rooms, Chats } = require("../database/models");
 const { findRoomUsers } = require("../utils");
 const { isNewRoom } = require("../utils");
 
-const joinRoom =
+const createRoom =
   (io, socket) =>
-  async ({ name, avatar }) => {
+  async ({ name, avatar }, callback) => {
     try {
       const id = socket.id;
 
@@ -29,14 +29,15 @@ const joinRoom =
         },
       ];
 
-      const roomCreated = await room.save();
-      console.log("roomCreated", roomCreated);
+      const newRoom = await room.save();
+      console.log("newRoom:", newRoom);
       socket.join(roomName);
 
-      io.to(room.name).emit("createRoom", roomCreated);
+      callback(newRoom);
     } catch (err) {
       console.log(err);
+      callback(err);
     }
   };
 
-module.exports = joinRoom;
+module.exports = createRoom;

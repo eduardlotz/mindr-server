@@ -3,17 +3,24 @@ const { Schema, model } = require("mongoose");
 const gameSchema = new Schema({
   name: {
     type: String,
+    required: true,
+  },
+  imageClass: {
+    type: String,
+    required: true,
+  },
+  images: {
+    type: [String],
+    required: true,
   },
   isActive: {
     type: Boolean,
     default: false,
   },
-  isSelected: {
+  isAvailable: {
     type: Boolean,
     default: false,
   },
 });
 
-const Games = model("Games", gameSchema);
-
-module.exports = Games;
+module.exports = gameSchema;

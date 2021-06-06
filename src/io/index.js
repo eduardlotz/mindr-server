@@ -18,7 +18,7 @@ const ioHandler = (io) => (socket, callback) => {
     console.log(err);
   });
 
-  // socket.on("disconnecting", socketDisconnect(io, socket));
+  socket.on("disconnecting", socketDisconnect(io, socket));
 };
 
 module.exports = ioHandler;

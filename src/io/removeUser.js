@@ -3,7 +3,7 @@ const createError = require("../utils/createError");
 
 const removeUser =
   (io, socket) =>
-  async ({ id, room: roomName }, callback) => {
+  async ({ id, room: roomName }) => {
     try {
       const clientId = socket.id;
       console.log("client id", clientId);
@@ -13,7 +13,6 @@ const removeUser =
       // message has to match an i18n translation string
       if (!room) {
         const error = createError(400, "Bad Request", "roomInvalid");
-        callback(error);
         throw error;
       }
 
@@ -38,14 +37,13 @@ const removeUser =
       console.log("roomAfterKicking", roomAfterKicking);
 
       //if no users left in the room, delete the room
-      //else inform others in room about the left user
       if (roomAfterKicking.users.length === 0)
-        Rooms.deleteOne({ name: roomName }, function (err) {
+        Rooms.deleteOne({ _id: room_id }, function (err) {
           if (err) console.log(err);
         });
+      //inform others in room about the leaving user
       else io.to(room.name).emit("roomData", roomAfterKicking);
     } catch (err) {
-      callback({ statusCode: 400 });
       console.error(err);
     }
   };

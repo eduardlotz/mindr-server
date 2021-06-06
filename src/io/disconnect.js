@@ -1,19 +1,28 @@
 const { Rooms } = require("../database/models");
-const { findRoomUsers } = require("../utils");
+const { createError } = require("../utils");
 
 const socketDisconnect = (io, socket) => async () => {
   try {
-    const room = Object.keys(socket.rooms)[1];
-    // socket.rooms returns an object where key and value are the same
-    // first key is socket id, second key is rooms name
-
     const _id = socket.id;
+    const room = await Rooms.findOne({ "users.uuid": _id });
 
-    await Rooms.updateOne({ room }, { $pullAll: { users: [_id] } });
+    if (!room) throw createError(400, "Bad Request", "roomInvalid");
 
-    const usersInfo = await findRoomUsers(room);
+    console.log("room where user gets kicked", room);
 
-    io.to(room).emit("joinRoom", usersInfo);
+    room.users = room.users.filter((user) => {
+      return user.uuid !== _id;
+    });
+
+    const roomAfterDisconnecting = await room.save();
+    socket.leave(room.name);
+
+    //if no users left in the room, delete the room
+    if (roomAfterDisconnecting.users.length === 0)
+      Rooms.deleteOne({ _id: room._id }, function (err) {
+        if (err) console.log(err);
+      });
+    else io.to(room.name).emit("roomData", roomAfterDisconnecting);
   } catch (err) {
     console.log(err);
   }
